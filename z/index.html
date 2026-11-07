@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه‌ریز محتوا و هاست | اشکان پیمان</title>
+    <link rel="icon" type="image/webp" href="logo.webp">
+<link rel="apple-touch-icon" href="logo.webp">
+    
+    <!-- فونت وزیرمتن -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========== ریست و متغیرها ========== */
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: rgba(21, 21, 31, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(124, 58, 237, 0.4);
+            --text: #e8e8f0;
+            --text-soft: #a0a0b8;
+            --text-dim: #6b6b85;
+            --primary: #7c3aed;
+            --primary-light: #a78bfa;
+            --accent: #06b6d4;
+            --gradient: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+            --gradient-soft: linear-gradient(135deg, rgba(124,58,237,.15) 0%, rgba(6,182,212,.15) 100%);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-lg: 24px;
+            --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazirmatn', system-ui, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 25%),
+                radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 10% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 90% 85%, rgba(124, 58, 237, 0.12) 0%, transparent 25%);
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ========== هدر ========== */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 12px 0;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(6, 182, 212, 0.15) 100%), rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .logo-img {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid transparent;
+            background: linear-gradient(var(--bg), var(--bg)) padding-box, var(--gradient) border-box;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-menu a {
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-soft);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ========== بخش هدر صفحه ========== */
+        .planner-header {
+            padding: 150px 0 50px;
+            text-align: center;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 100px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .planner-header p {
+            color: var(--text-soft);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ========== شبکه کارت‌ها ========== */
+        .section {
+            padding: 20px 0 100px;
+        }
+
+        .planner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .day-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s ease;
+        }
+
+        .day-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(124, 58, 237, 0.15);
+            background: rgba(30, 30, 45, 0.8);
+        }
+
+        .day-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .day-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 16px;
+        }
+
+        .day-icon {
+            width: 42px; height: 42px;
+            display: grid;
+            place-items: center;
+            background: var(--gradient-soft);
+            border-radius: 12px;
+            color: var(--primary-light);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .day-card:hover .day-icon {
+            background: var(--gradient);
+            color: #fff;
+            transform: scale(1.1) rotate(-5deg);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .day-icon svg { width: 22px; height: 22px; }
+
+        .task-group { margin-bottom: 16px; }
+
+        .task-group-title {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .task-group-title svg { width: 14px; height: 14px; }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: var(--text-soft);
+            margin-bottom: 10px;
+            line-height: 1.6;
+            transition: color 0.2s ease;
+        }
+
+        .task-item:hover { color: var(--text); }
+
+        .task-item svg {
+            flex-shrink: 0;
+            margin-top: 4px;
+            color: var(--primary);
+            width: 16px; height: 16px;
+        }
+
+        /* ========== چک‌لیست ========== */
+        .host-checklist {
+            background: rgba(124, 58, 237, 0.03);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            max-width: 850px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .host-checklist::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .host-checklist h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .host-checklist h2 svg { color: var(--accent); width: 28px; height: 28px; }
+
+        .host-checklist p {
+            color: var(--text-soft);
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .check-item:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(124, 58, 237, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .check-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px; height: 22px;
+            border: 2px solid var(--text-dim);
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .check-item input[type="checkbox"]:checked {
+            background: var(--gradient);
+            border-color: transparent;
+        }
+
+        .check-item input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 45%; left: 50%;
+            width: 6px; height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .check-item label {
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .check-item input:checked + label {
+            text-decoration: line-through;
+            color: var(--text-dim);
+        }
+
+        /* ========== فوتر ========== */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+        }
+
+        /* ========== ریسپانسیو ========== */
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .host-checklist { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="logo">
+                <img src="logo.webp" alt="اشکان پیمان" class="logo-img" width="40" height="40">
+                <span>اشکان پیمان</span>
+            </a>
+            <ul class="nav-menu">
+              
+            </ul>
+        </nav>
+    </header>
+
+    <section class="planner-header">
+        <div class="container">
+            <span class="section-tag">داشبورد شخصی</span>
+            <h1 class="section-title">برنامه‌ریز محتوا و هاست</h1>
+            <p>نقشه راه هفتگی من برای تولید محتوا در تلگرام و اینستاگرام و چک‌لیست فنی نگهداری از سایت و دامنه.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            
+            <div class="planner-grid">
+                <!-- شنبه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        </div>
+                        شنبه (روز کد)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            تلگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> یک نکته کوتاه از HTML/CSS یا C#</div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> معرفی یک تحقیق یا مقاله</div>
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            اینستاگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> پست عکس از کدی که نوشتی</div>
+                    </div>
+                </div>
+
+                <!-- یکشنبه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        یکشنبه (پروژه)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            تلگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> معرفی بخشی از پروژه</div>
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            اینستاگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> معرفی سایت کاربردی</div>
+                    </div>
+                </div>
+
+                <!-- دوشنبه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        دوشنبه (چالش)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            تلگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> اعلام چالش هفتگی بات</div>
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            اینستاگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> استوری نظرسنجی</div>
+                    </div>
+                </div>
+
+                <!-- سه‌شنبه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        سه‌شنبه (پشت صحنه)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            تلگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> بیان یک تجربه از باگ‌ها</div>
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            اینستاگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> عکس از میز کار</div>
+                    </div>
+                </div>
+
+                <!-- چهارشنبه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        </div>
+                        چهارشنبه (آموزش)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            تلگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> انتشار یک مقاله کوتاه</div>
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            اینستاگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> پست کاروسل آموزشی</div>
+                    </div>
+                </div>
+
+                <!-- پنجشنبه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        پنجشنبه (تعامل)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                            تلگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> پرسیدن سوال از کاربران</div>
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                            اینستاگرام
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> استوری سوال بپرس</div>
+                    </div>
+                </div>
+
+                <!-- جمعه -->
+                <div class="day-card">
+                    <div class="day-title">
+                        <div class="day-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        جمعه (استراحت)
+                    </div>
+                    <div class="task-group">
+                        <div class="task-group-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            هر دو پلتفرم
+                        </div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> پست سبک و انگیزشی</div>
+                        <div class="task-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> بررسی آمار هفته</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- چک‌لیست فنی هاست و دامنه -->
+            <div class="host-checklist">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                    چک‌لیست هفتگی هاست و دامنه
+                </h2>
+                <p>این مورد را هر جمعه قبل از استراحت انجام بده و تیک بزن تا در حافظه مرورگر ذخیره شود.</p>
+
+                <div class="check-item">
+                    <input type="checkbox" id="task1">
+                    <label for="task1">بررسی تاریخ انقضای دامنه و هاست</label>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>ساخته شده با ❤️ توسط اشکان پیمان</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+            
+            checkboxes.forEach(box => {
+                const savedState = localStorage.getItem(box.id);
+                if (savedState === 'true') {
+                    box.checked = true;
+                }
+
+                box.addEventListener('change', () => {
+                    localStorage.setItem(box.id, box.checked);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
